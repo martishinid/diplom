@@ -130,15 +130,23 @@ terraform-проект [gitlab](gitlab)
 - При **создании тега** (например, `v1.0.0`):
   - Сборка и отправка Docker-образа с соответствующим **лейблом**
   - **Деплой** Docker-образа в кластер **Kubernetes**
-1. Импорт проекта из github.
+  
+1. **Импорт проекта из GitHub**
 
-2.1. Создание и заполнение файла [.gitlab-ci.yml](.gitlab-ci.yml)
-	 - Создание Runners для выполнения кода terraform
-     - описание этапов обработки: `validate`, `plan`, `apply`, `destroy`
-     - описание обработчиков каждого этапа с вызовом команды `terraform ...`
-2.2. Создание и заполнение файла [.gitlab-ci.yml](nginx-app/.gitlab-ci.yml)
-	- описание этапов разработки: `build`, `deploy`
-## Этапы CI/CD
+2. **Настройка CI/CD**
+   1. **Файл [.gitlab-ci.yml](.gitlab-ci.yml)**
+      - Создание Runners для выполнения кода Terraform
+      - Этапы:
+        - `validate`
+        - `plan`
+        - `apply`
+        - `destroy`
+      - Обработчики для каждого этапа с вызовом `terraform ...`
+
+   2. **Файл [.gitlab-ci.yml](nginx-app/.gitlab-ci.yml)**
+      - Этапы:
+        - `build`
+        - `deploy`
 
 ### build
 - Используется образ **Kaniko** для сборки и пуша Docker-образа.
@@ -188,6 +196,8 @@ terraform-проект [gitlab](gitlab)
 
 ## Полезные дополнительные материалы, которые пригодились для выполнения задания
 [Yandex Container registry конфигурации сценария CI](https://yandex.cloud/ru/docs/managed-gitlab/tutorials/image-storage)
+[Yandex  конфигурации сценария CI для Kubernetes - 1](https://yandex.cloud/ru/docs/tutorials/infrastructure-management/gitlab-containers#token_3)
+[Yandex  конфигурации сценария CI для Kubernetes - 2](https://yandex.cloud/ru/docs/managed-kubernetes/operations/connect/create-static-conf#prepare-token)
 [Установка kubernetes через kubespray - habr](https://habr.com/ru/articles/426959/)
 
 [https://dev.to/admantium/kubernetes-installation-tutorial-kubespray-46ek?ysclid=m97m4b14sh390719292](https://dev.to/admantium/kubernetes-installation-tutorial-kubespray-46ek?ysclid=m97m4b14sh390719292)
