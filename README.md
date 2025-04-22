@@ -133,10 +133,11 @@ terraform-проект [gitlab](gitlab)
 1. Импорт проекта из github.
 
 2.1. Создание и заполнение файла [.gitlab-ci.yml](.gitlab-ci.yml)
-	- Создание Runners для выполнения кода terraform
-    - описание этапов обработки: `validate`, `plan`, `apply`, `destroy`
-    - описание обработчиков каждого этапа с вызовом команды `terraform ...`
+	 - Создание Runners для выполнения кода terraform
+     - описание этапов обработки: `validate`, `plan`, `apply`, `destroy`
+     - описание обработчиков каждого этапа с вызовом команды `terraform ...`
 2.2. Создание и заполнение файла [.gitlab-ci.yml](nginx-app/.gitlab-ci.yml)
+	- описание этапов разработки: `build`, `deploy`
 ## Этапы CI/CD
 
 ### build
