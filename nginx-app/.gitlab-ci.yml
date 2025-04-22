@@ -1,0 +1,84 @@
+variables:
+  DOCKER_IMAGE: cr.yandex/crpm1igckg6aga48k0qd/nginx-app
+  KUBE_CONFIG: /tmp/kubeconfig
+  #DOCKER_CONFIG_PATH: /kaniko/.docker/config.json
+
+stages:
+  - build
+  - deploy
+
+# before_script:
+#   - echo "Logging in to Yandex Container Registry..."
+#   - mkdir -p /kaniko/.docker
+# #  - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n "json_key:${YC_KEY}" | base64 | tr -d '\n' )\"}}}" > /kaniko/.docker/config.json
+#   - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n "json_key:${CI_REGISTRY_KEY}" | base64 | tr -d '\n' )\"}}}" > /kaniko/.docker/config.json
+  
+
+build:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]  # Преобразуем образ, чтобы избежать его стандартного поведения
+  tags:
+    - docker-k8s
+  before_script:
+  - echo "Logging in to Yandex Container Registry..."
+  - mkdir -p /kaniko/.docker
+#  - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n "json_key:${YC_KEY}" | base64 | tr -d '\n' )\"}}}" > /kaniko/.docker/config.json
+  - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n "json_key:${CI_REGISTRY_KEY}" | base64 | tr -d '\n' )\"}}}" > /kaniko/.docker/config.json
+
+  script:
+    # Сборка и отправка контейнера в реестр с использованием Kaniko
+    - ls -la "$CI_PROJECT_DIR"
+    - cat "$CI_PROJECT_DIR/nginx-app/Dockerfile" || echo "Dockerfile NOT FOUND"
+    - echo "$CI_REGISTRY"
+    - echo "$CI_REGISTRY_KEY"
+    - cat /kaniko/.docker/config.json
+    - /kaniko/executor --context "${CI_PROJECT_DIR}/nginx-app" --dockerfile "${CI_PROJECT_DIR}/nginx-app/Dockerfile" --destination "$DOCKER_IMAGE:$CI_COMMIT_SHORT_SHA"
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never
+    - when: always
+
+build_tag:
+  stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]  # Преобразуем образ, чтобы избежать его стандартного поведения
+  tags:
+    - docker-k8s
+  before_script:
+  - echo "Logging in to Yandex Container Registry..."
+  - mkdir -p /kaniko/.docker
+#  - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n "json_key:${YC_KEY}" | base64 | tr -d '\n' )\"}}}" > /kaniko/.docker/config.json
+  - echo "{\"auths\":{\"$CI_REGISTRY\":{\"auth\":\"$(echo -n "json_key:${CI_REGISTRY_KEY}" | base64 | tr -d '\n' )\"}}}" > /kaniko/.docker/config.json
+
+  script:
+    # Сборка и отправка контейнера с тегом, основанным на теге коммита
+    - /kaniko/executor --context "${CI_PROJECT_DIR}/nginx-app" --dockerfile "${CI_PROJECT_DIR}/nginx-app/Dockerfile" --destination "$DOCKER_IMAGE:$CI_COMMIT_TAG"
+  rules:
+    - if: $CI_COMMIT_TAG
+
+deploy:
+  stage: deploy
+  #image: gcr.io/cloud-builders/kubectl:latest
+  image: 
+    name: bitnami/kubectl:latest
+    entrypoint: ['']
+  tags:
+    - docker-k8s
+  script:
+    # Декодирование kubeconfig и применение конфигурации для деплоя.
+    # - echo "$KUBE_CONFIG_DATA" | base64 -d > $KUBE_CONFIG
+    # - export KUBECONFIG=$KUBE_CONFIG
+    - kubectl config set-cluster yc-dcluster --server="$KUBE_URL" --insecure-skip-tls-verify=true
+    - kubectl config set-credentials admin --token="$KUBE_TOKEN"
+    - kubectl config view
+    - kubectl config set-context yc-dcluster --cluster=yc-dcluster --user=admin
+    - kubectl config use-context yc-dcluster
+    - ls -la "$CI_PROJECT_DIR"
+    - sed "s|__IMAGE__|$DOCKER_IMAGE:$CI_COMMIT_TAG|" "${CI_PROJECT_DIR}/nginx-app/k8s/deployment.yaml" | kubectl apply -f -
+    - kubectl apply -f "${CI_PROJECT_DIR}/nginx-app/k8s/service.yaml"
+    - kubectl rollout status deployment/nginx-app
+  rules:
+    - if: $CI_COMMIT_TAG

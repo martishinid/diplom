@@ -1,0 +1,7 @@
+#cloud-config
+users:
+  - name: gitlab
+    groups: [sudo, docker] 
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    lock_passwd: true

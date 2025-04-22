@@ -1,0 +1,25 @@
+grafana:
+  adminPassword: "admin"
+  service:
+    type: LoadBalancer
+  ingress:
+    enabled: false
+
+prometheus:
+  service:
+    type: LoadBalancer
+  ingress:
+    enabled: false
+
+alertmanager:
+  service:
+    type: LoadBalancer
+  ingress:
+    enabled: false
+
+# Включаем exporters (включены по умолчанию, но можно явно указать)
+nodeExporter:
+  enabled: true
+
+kubeStateMetrics:
+  enabled: true
