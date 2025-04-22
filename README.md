@@ -130,7 +130,7 @@ terraform-проект [gitlab](gitlab)
 - При **создании тега** (например, `v1.0.0`):
   - Сборка и отправка Docker-образа с соответствующим **лейблом**
   - **Деплой** Docker-образа в кластер **Kubernetes**
-  
+
 1. **Импорт проекта из GitHub**
 
 2. **Настройка CI/CD**
@@ -196,8 +196,11 @@ terraform-проект [gitlab](gitlab)
 
 ## Полезные дополнительные материалы, которые пригодились для выполнения задания
 [Yandex Container registry конфигурации сценария CI](https://yandex.cloud/ru/docs/managed-gitlab/tutorials/image-storage)
+
 [Yandex  конфигурации сценария CI для Kubernetes - 1](https://yandex.cloud/ru/docs/tutorials/infrastructure-management/gitlab-containers#token_3)
+
 [Yandex  конфигурации сценария CI для Kubernetes - 2](https://yandex.cloud/ru/docs/managed-kubernetes/operations/connect/create-static-conf#prepare-token)
+
 [Установка kubernetes через kubespray - habr](https://habr.com/ru/articles/426959/)
 
 [https://dev.to/admantium/kubernetes-installation-tutorial-kubespray-46ek?ysclid=m97m4b14sh390719292](https://dev.to/admantium/kubernetes-installation-tutorial-kubespray-46ek?ysclid=m97m4b14sh390719292)
